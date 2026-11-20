@@ -1,0 +1,32 @@
+{
+  "name": "devdrop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DevDrop — local-network file sharing between Windows PC and Android over LAN",
+  "workspaces": [
+    "apps/server",
+    "apps/web",
+    "apps/extension",
+    "apps/android",
+    "packages/shared",
+    "packages/api-types",
+    "packages/validation"
+  ],
+  "scripts": {
+    "devdrop:start": "node apps/server/dist/index.js",
+    "devdrop:stop": "powershell -Command \"$c = Get-NetTCPConnection -LocalPort 4545 -ErrorAction SilentlyContinue | Where-Object { $_.OwningProcess -gt 0 }; if ($c) { Stop-Process -Id $c.OwningProcess -Force -ErrorAction SilentlyContinue; Write-Host '✓ DevDrop server stopped.' } else { Write-Host 'DevDrop server is not running.' }\"",
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present && rimraf node_modules"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "rimraf": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

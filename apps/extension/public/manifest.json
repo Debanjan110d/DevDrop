@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "DevDrop",
+  "version": "1.0.0",
+  "description": "Your devices. Your network. Your files. Quick access to DevDrop local sharing.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1m934uLsNCLU7wda+u2p2/IzvThH66ho9/TZeLzk7kCMO1mZSzp7VImlDGvAHSMAVEnJTn2xy2dZq/73Lwhg/HfVd7q/pKlwnoAKUKj10jA849L7MVrKsdp9ztGjUCpKw2n9IdoLIebHOg+baKPfR7u+j7BGXMaw6DCZF73KYw3jfOWG/xIukrw1xHok7NCCol3TH4ZBuohej58qFQLlXvBEjJWGyKbyMHC+GIaYLRiBSx1LexNF06nPGbknxHOktr8YmBg7ne0vJH0S5xlxAhNA9O2ogiUlLGZIXF2nzbvPalLcPb9bSS/wtwL51FCb6MsTsNLg5B6sP8zacyP0FQIDAQAB",
+  "permissions": [
+    "storage",
+    "alarms",
+    "contextMenus",
+    "notifications",
+    "nativeMessaging"
+  ],
+  "host_permissions": [
+    "http://localhost/*",
+    "http://127.0.0.1/*",
+    "http://*/*"
+  ],
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background/service-worker.js",
+    "type": "module"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

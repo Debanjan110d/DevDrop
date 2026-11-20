@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "@devdrop/shared": ["../../packages/shared/src/index.ts"],
+      "@devdrop/api-types": ["../../packages/api-types/src/index.ts"],
+      "@devdrop/validation": ["../../packages/validation/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

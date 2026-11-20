@@ -1,0 +1,10 @@
+{
+  "name": "com.devdrop.launcher",
+  "description": "DevDrop On-Demand Server Launcher",
+  "path": "D:\\DevDrop\\tools\\native-host\\launcher.bat",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://lpdpmidbnjljcbbmheeiebjddcjigjbd/"
+  ]
+}
+
