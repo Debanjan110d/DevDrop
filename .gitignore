@@ -97,3 +97,8 @@ coverage/
 /tmp/
 /temp/
 /scratch/
+
+# Local Agent Guidelines & Configs (Keep local only)
+AGENTS.md
+GEMINI.md
+.agents/
