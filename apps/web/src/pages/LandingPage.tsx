@@ -690,14 +690,25 @@ while (isRunning) {
               </div>
             </div>
 
-            <a
-              href="/devdrop.apk"
-              download="devdrop.apk"
-              className="inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors"
-            >
-              <Download className="h-4 w-4" />
-              <span>Download devdrop.apk</span>
-            </a>
+            <div className="space-y-2">
+              <a
+                href="/devdrop.apk"
+                download="devdrop.apk"
+                className="inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors"
+              >
+                <Download className="h-4 w-4" />
+                <span>Download devdrop.apk</span>
+              </a>
+              <a
+                href="https://github.com/Debanjan110d/DevDrop/actions"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-1.5 w-full py-2 rounded-lg border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-300 text-[11px] font-medium transition-colors"
+              >
+                <span>Automated CI Builds & Actions</span>
+                <ExternalLink className="h-3 w-3 text-slate-400" />
+              </a>
+            </div>
           </div>
 
           {/* Extension Card */}

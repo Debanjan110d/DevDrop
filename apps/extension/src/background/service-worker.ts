@@ -45,7 +45,7 @@ function setupContextMenus() {
 
 chrome.contextMenus.onClicked.addListener((info) => {
   if (info.menuItemId === 'devdrop-open-dashboard') {
-    chrome.tabs.create({ url: 'http://localhost:4545' });
+    chrome.tabs.create({ url: 'http://localhost:4545/dashboard' });
   } else if (info.menuItemId === 'devdrop-send-page' || info.menuItemId === 'devdrop-send-link') {
     chrome.tabs.create({ url: 'http://localhost:4545/send' });
   }

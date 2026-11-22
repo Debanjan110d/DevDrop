@@ -126,7 +126,7 @@ export default function OfflineMessage({ onRetry, onStartServer, isStarting }: P
           </button>
           <button
             style={styles.guideButton}
-            onClick={() => chrome.tabs.create({ url: 'http://localhost:4545' })}
+            onClick={() => chrome.tabs.create({ url: 'http://localhost:4545/dashboard' })}
           >
             Open Browser Tab
           </button>

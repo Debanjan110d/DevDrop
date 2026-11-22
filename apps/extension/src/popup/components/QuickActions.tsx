@@ -59,7 +59,7 @@ export default function QuickActions({ dashboardUrl }: Props) {
     <div style={styles.container}>
       <button
         style={styles.primaryBtn}
-        onClick={() => openUrl('')}
+        onClick={() => openUrl('/dashboard')}
         onMouseEnter={(e) => {
           (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#4f46e5';
         }}
