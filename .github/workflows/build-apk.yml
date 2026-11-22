@@ -71,17 +71,27 @@ jobs:
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;27.1.12297006" || true
 
+      - name: Configure local.properties
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > apps/android/android/local.properties
+          echo "ndk.dir=$ANDROID_HOME/ndk/27.1.12297006" >> apps/android/android/local.properties
+          cat apps/android/android/local.properties
+
       - name: Make Gradlew Executable
         run: chmod +x apps/android/android/gradlew
 
       - name: Build Release APK
         working-directory: apps/android/android
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
+          ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/27.1.12297006
         run: |
-          ./gradlew assembleRelease --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log || (tail -n 120 /tmp/gradle.log && exit 1)
+          ./gradlew assembleRelease --no-daemon --stacktrace
 
       - name: Locate and Package APK
         run: |
           echo "=== Locating Built APKs ==="
+          ls -la apps/android/android/app/build/outputs/apk/release/ || true
           find apps/android/android -name "*.apk"
           mkdir -p dist/apk
           APK_FILE=$(find apps/android/android -name "*.apk" | grep -E "release|app" | head -n 1)
