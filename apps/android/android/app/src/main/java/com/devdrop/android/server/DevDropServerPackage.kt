@@ -16,3 +16,4 @@ class DevDropServerPackage : ReactPackage {
         return emptyList()
     }
 }
+
