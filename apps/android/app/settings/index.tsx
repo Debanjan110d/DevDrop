@@ -77,6 +77,70 @@ export default function SettingsScreen() {
         </View>
       </View>
 
+      {/* Storage Folder Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Storage & Permissions</Text>
+        <View style={styles.card}>
+          <View style={styles.row}>
+            <Text style={styles.label}>Save Directory</Text>
+            <Text style={[styles.value, { color: '#818cf8', fontWeight: 'bold' }]}>
+              Downloads/DevDrop
+            </Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Access Type</Text>
+            <Text style={styles.value}>Public Downloads (User Visible)</Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.dangerBtn, { backgroundColor: '#4f46e5', marginTop: 12 }]}
+            onPress={async () => {
+              const { requestStoragePermissions } = await import('../../src/services/permissions/storagePermission');
+              const granted = await requestStoragePermissions();
+              Alert.alert(
+                'Storage Permission',
+                granted ? 'Storage permission is granted! Files will save to Downloads/DevDrop.' : 'Storage permission was not granted.'
+              );
+            }}
+          >
+            <Text style={styles.dangerBtnText}>Check / Grant Storage Permission</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* App Updates Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Software Updates</Text>
+        <View style={styles.card}>
+          <Text style={styles.dangerNotice}>
+            DevDrop can check for and download official APK updates directly over Wi-Fi or GitHub.
+          </Text>
+          <TouchableOpacity
+            style={[styles.dangerBtn, { backgroundColor: '#059669', marginTop: 8 }]}
+            onPress={async () => {
+              const { updateService } = await import('../../src/services/updates/update.service');
+              const info = await updateService.checkForUpdates(credentials?.serverUrl);
+              if (info && info.hasUpdate) {
+                Alert.alert(
+                  'Update Found!',
+                  `DevDrop v${info.version} is available. Do you want to download and install it now?`,
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Install Now',
+                      onPress: () => updateService.downloadAndInstallUpdate(info.downloadUrl),
+                    },
+                  ]
+                );
+              } else {
+                Alert.alert('Up to Date', 'You are running the latest version of DevDrop (v1.0.0).');
+              }
+            }}
+          >
+            <Text style={styles.dangerBtnText}>Check for Updates Now</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
       {/* Connection Reset */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Danger Zone</Text>

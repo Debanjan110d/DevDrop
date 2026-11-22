@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useEffect, useReducer, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useReducer, useCallback, useState } from 'react';
 import { getCredentials, clearCredentials, saveCredentials } from '../services/storage/secureStore';
 import { fetchTransfers, checkServerHealth } from '../services/api/client';
 import { socketService, type SocketStatus } from '../services/sockets/socket.service';
+import { nativeServer, type DirectFileEvent, type DirectTextEvent } from '../services/nativeServer/nativeServer.service';
+import { peerDiscovery, type DiscoveredPeer } from '../services/network/peerDiscovery.service';
 import type { ServerConnectionConfig, Transfer } from '../types';
 
 interface AppState {
@@ -13,6 +15,13 @@ interface AppState {
   transfers: Transfer[];
   isLoadingTransfers: boolean;
   error: string | null;
+  // P2P & Autonomous Network State
+  localIp: string | null;
+  listeningPort: number;
+  isServerRunning: boolean;
+  nearbyPeers: DiscoveredPeer[];
+  isScanningPeers: boolean;
+  latestDirectDrop: { type: 'file' | 'text'; name?: string; text?: string; sender: string; timestamp: number } | null;
 }
 
 type AppAction =
@@ -24,7 +33,11 @@ type AppAction =
   | { type: 'UPDATE_TRANSFER'; payload: Transfer }
   | { type: 'TRANSFER_PROGRESS'; payload: { transferId: string; bytesTransferred: number; percentage: number } }
   | { type: 'UNPAIR' }
-  | { type: 'SET_ERROR'; payload: string | null };
+  | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'SET_P2P_INFO'; payload: { localIp: string | null; port: number; isRunning: boolean } }
+  | { type: 'SET_NEARBY_PEERS'; payload: DiscoveredPeer[] }
+  | { type: 'SET_SCANNING_PEERS'; payload: boolean }
+  | { type: 'SET_LATEST_DIRECT_DROP'; payload: AppState['latestDirectDrop'] };
 
 const initialState: AppState = {
   isInitialized: false,
@@ -35,6 +48,12 @@ const initialState: AppState = {
   transfers: [],
   isLoadingTransfers: false,
   error: null,
+  localIp: null,
+  listeningPort: 4545,
+  isServerRunning: false,
+  nearbyPeers: [],
+  isScanningPeers: false,
+  latestDirectDrop: null,
 };
 
 function appReducer(state: AppState, action: AppAction): AppState {
@@ -84,6 +103,19 @@ function appReducer(state: AppState, action: AppAction): AppState {
       };
     case 'SET_ERROR':
       return { ...state, error: action.payload };
+    case 'SET_P2P_INFO':
+      return {
+        ...state,
+        localIp: action.payload.localIp,
+        listeningPort: action.payload.port,
+        isServerRunning: action.payload.isRunning,
+      };
+    case 'SET_NEARBY_PEERS':
+      return { ...state, nearbyPeers: action.payload };
+    case 'SET_SCANNING_PEERS':
+      return { ...state, isScanningPeers: action.payload };
+    case 'SET_LATEST_DIRECT_DROP':
+      return { ...state, latestDirectDrop: action.payload };
     default:
       return state;
   }
@@ -94,6 +126,10 @@ interface AppContextValue extends AppState {
   unpairDevice: () => Promise<void>;
   checkConnection: () => Promise<boolean>;
   setCredentialsAfterPairing: (creds: ServerConnectionConfig) => void;
+  scanNearbyPeers: () => Promise<void>;
+  startMobileHost: () => Promise<number>;
+  stopMobileHost: () => Promise<void>;
+  clearLatestDirectDrop: () => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -118,8 +154,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const list = await fetchTransfers();
       dispatch({ type: 'SET_TRANSFERS', payload: list });
-    } catch (err: any) {
-      // ignore in background
+    } catch {
+      // ignore
     }
   }, [state.isPaired]);
 
@@ -132,6 +168,111 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const setCredentialsAfterPairing = useCallback((creds: ServerConnectionConfig) => {
     dispatch({ type: 'INIT_SUCCESS', payload: creds });
     socketService.connect(creds.serverUrl, creds.deviceToken);
+  }, []);
+
+  const scanNearbyPeers = useCallback(async () => {
+    dispatch({ type: 'SET_SCANNING_PEERS', payload: true });
+    try {
+      const peers = await peerDiscovery.scanSubnet(4545, (peer) => {
+        dispatch({
+          type: 'SET_NEARBY_PEERS',
+          payload: peerDiscovery.getCachedPeers(),
+        });
+      });
+      dispatch({ type: 'SET_NEARBY_PEERS', payload: peers });
+    } finally {
+      dispatch({ type: 'SET_SCANNING_PEERS', payload: false });
+    }
+  }, []);
+
+  const startMobileHost = useCallback(async (): Promise<number> => {
+    const res = await nativeServer.startServer(
+      4545,
+      state.credentials?.deviceName || 'Android Device'
+    );
+    const ip = await peerDiscovery.getLocalIp();
+    dispatch({
+      type: 'SET_P2P_INFO',
+      payload: { localIp: ip, port: res.port, isRunning: res.isRunning },
+    });
+    return res.port;
+  }, [state.credentials?.deviceName]);
+
+  const stopMobileHost = useCallback(async () => {
+    const res = await nativeServer.stopServer();
+    dispatch({
+      type: 'SET_P2P_INFO',
+      payload: { localIp: state.localIp, port: state.listeningPort, isRunning: res.isRunning },
+    });
+  }, [state.localIp, state.listeningPort]);
+
+  const clearLatestDirectDrop = useCallback(() => {
+    dispatch({ type: 'SET_LATEST_DIRECT_DROP', payload: null });
+  }, []);
+
+  // Initialize native micro-server & local Wi-Fi state on startup
+  useEffect(() => {
+    (async () => {
+      try {
+        const ip = await peerDiscovery.getLocalIp();
+        const serverStatus = await nativeServer.startServer(4545, 'Android Device');
+        dispatch({
+          type: 'SET_P2P_INFO',
+          payload: {
+            localIp: ip,
+            port: serverStatus.port || 4545,
+            isRunning: serverStatus.isRunning,
+          },
+        });
+      } catch (err) {
+        console.warn('Native server auto-start note:', err);
+      }
+    })();
+
+    // Listen for direct drops from other mobile devices on the Wi-Fi
+    const unsubFile = nativeServer.onFileReceived((evt: DirectFileEvent) => {
+      // Create a completed transfer entry in local history
+      const directTransfer: Transfer = {
+        id: `direct-file-${Date.now()}`,
+        fileName: evt.fileName,
+        fileSize: evt.fileSize,
+        mimeType: 'application/octet-stream',
+        direction: 'mobile-to-pc', // received
+        status: 'completed',
+        bytesTransferred: evt.fileSize,
+        createdAt: new Date(evt.timestamp).toISOString(),
+        completedAt: new Date(evt.timestamp).toISOString(),
+        sourceDeviceId: evt.senderName,
+        destinationDeviceId: 'me',
+      };
+      dispatch({ type: 'UPDATE_TRANSFER', payload: directTransfer });
+      dispatch({
+        type: 'SET_LATEST_DIRECT_DROP',
+        payload: {
+          type: 'file',
+          name: evt.fileName,
+          sender: evt.senderName,
+          timestamp: evt.timestamp,
+        },
+      });
+    });
+
+    const unsubText = nativeServer.onTextReceived((evt: DirectTextEvent) => {
+      dispatch({
+        type: 'SET_LATEST_DIRECT_DROP',
+        payload: {
+          type: 'text',
+          text: evt.text,
+          sender: evt.senderName,
+          timestamp: evt.timestamp,
+        },
+      });
+    });
+
+    return () => {
+      unsubFile();
+      unsubText();
+    };
   }, []);
 
   // Initialize from SecureStore
@@ -149,7 +290,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             dispatch({ type: 'SET_SERVER_STATUS', payload: false });
           }
         }
-      } catch (err: any) {
+      } catch {
         dispatch({ type: 'INIT_SUCCESS', payload: null });
       }
     })();
@@ -188,6 +329,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [state.isPaired, refreshTransfers, checkConnection]);
 
+  // Periodic peer scan
+  useEffect(() => {
+    scanNearbyPeers();
+    const interval = setInterval(scanNearbyPeers, 15000);
+    return () => clearInterval(interval);
+  }, [scanNearbyPeers]);
+
   return (
     <AppContext.Provider
       value={{
@@ -196,6 +344,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         unpairDevice,
         checkConnection,
         setCredentialsAfterPairing,
+        scanNearbyPeers,
+        startMobileHost,
+        stopMobileHost,
+        clearLatestDirectDrop,
       }}
     >
       {children}
@@ -210,4 +362,3 @@ export function useApp(): AppContextValue {
   }
   return context;
 }
-

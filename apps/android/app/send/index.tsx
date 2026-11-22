@@ -11,6 +11,7 @@ import {
 import * as DocumentPicker from 'expo-document-picker';
 import { useRouter } from 'expo-router';
 import { uploadFileToPc } from '../../src/services/transfers/transfer.service';
+import { sendDirectFile } from '../../src/services/network/directTransfer.service';
 import { fetchDevices } from '../../src/services/api/client';
 import { requestStoragePermissions } from '../../src/services/permissions/storagePermission';
 import { useApp } from '../../src/state/AppContext';
@@ -26,7 +27,7 @@ interface SelectedFile {
 
 export default function SendScreen() {
   const router = useRouter();
-  const { credentials, refreshTransfers } = useApp();
+  const { credentials, refreshTransfers, nearbyPeers, serverOnline } = useApp();
   const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [currentFileIndex, setCurrentFileIndex] = useState(0);
@@ -97,6 +98,11 @@ export default function SendScreen() {
 
   const getTargetName = () => {
     if (selectedTargetId === 'pc-host') return 'Host PC';
+    if (selectedTargetId.startsWith('peer:')) {
+      const parts = selectedTargetId.split(':');
+      const peer = nearbyPeers.find((p) => p.ip === parts[1]);
+      return peer ? peer.name : `Peer (${parts[1]})`;
+    }
     const d = devices.find((dev) => dev.id === selectedTargetId);
     return d?.name || 'Selected Device';
   };
@@ -116,15 +122,32 @@ export default function SendScreen() {
         setCurrentBytesSent(0);
         setCurrentTotalBytes(file.size);
 
-        await uploadFileToPc(
-          file,
-          ({ percentage, bytesSent, totalBytes }) => {
-            setCurrentFileProgress(percentage);
-            setCurrentBytesSent(bytesSent);
-            setCurrentTotalBytes(totalBytes);
-          },
-          selectedTargetId
-        );
+        if (selectedTargetId.startsWith('peer:')) {
+          const parts = selectedTargetId.split(':');
+          const peerIp = parts[1];
+          const peerPort = parseInt(parts[2], 10) || 4545;
+          await sendDirectFile(
+            peerIp,
+            peerPort,
+            file,
+            credentials?.deviceName || 'Android Device',
+            ({ percentage, bytesSent, totalBytes }) => {
+              setCurrentFileProgress(percentage);
+              setCurrentBytesSent(bytesSent);
+              setCurrentTotalBytes(totalBytes);
+            }
+          );
+        } else {
+          await uploadFileToPc(
+            file,
+            ({ percentage, bytesSent, totalBytes }) => {
+              setCurrentFileProgress(percentage);
+              setCurrentBytesSent(bytesSent);
+              setCurrentTotalBytes(totalBytes);
+            },
+            selectedTargetId
+          );
+        }
       }
 
       await refreshTransfers();
@@ -171,9 +194,46 @@ export default function SendScreen() {
               >
                 Host PC
               </Text>
-              <Text style={styles.chipSub}>Primary Hub</Text>
+              <Text style={styles.chipSub}>
+                {serverOnline ? 'Online (Hub)' : 'Offline'}
+              </Text>
             </View>
           </TouchableOpacity>
+
+          {/* Discovered Wi-Fi Peers (Phones, Tablets) */}
+          {nearbyPeers.map((peer) => {
+            const peerTargetId = `peer:${peer.ip}:${peer.port}`;
+            const isSelected = selectedTargetId === peerTargetId;
+            return (
+              <TouchableOpacity
+                key={peer.id}
+                style={[
+                  styles.deviceChip,
+                  isSelected && styles.deviceChipSelected,
+                  { borderColor: isSelected ? COLORS.primary : 'rgba(99, 102, 241, 0.4)' },
+                ]}
+                onPress={() => !isUploading && setSelectedTargetId(peerTargetId)}
+              >
+                <Text style={styles.chipIcon}>
+                  {peer.nodeType === 'android-peer' ? '📱' : '💻'}
+                </Text>
+                <View>
+                  <Text
+                    style={[
+                      styles.chipName,
+                      isSelected && styles.chipNameSelected,
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {peer.name}
+                  </Text>
+                  <Text style={[styles.chipSub, styles.onlineText]}>
+                    Wi-Fi Direct
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
 
           {/* Other Phones / Devices */}
           {devices.map((device) => {

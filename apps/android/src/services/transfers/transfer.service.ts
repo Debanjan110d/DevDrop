@@ -1,8 +1,12 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
+import { NativeModules } from 'react-native';
 import { createTransferRecord, cancelTransferRecord } from '../api/client';
 import { getCredentials } from '../storage/secureStore';
+import { requestStoragePermissions } from '../permissions/storagePermission';
 import type { Transfer } from '../../types';
+
+const { DevDropServerModule } = NativeModules;
 
 export interface UploadProgressCallback {
   (progress: { bytesSent: number; totalBytes: number; percentage: number }): void;
@@ -14,7 +18,7 @@ export interface DownloadProgressCallback {
 
 /**
  * Upload a local file to the Windows PC server.
- * Streams binary directly from filesystem into raw HTTP body (no Base64, no memory buffering).
+ * Streams binary directly from filesystem into raw HTTP body.
  */
 export async function uploadFileToPc(
   file: {
@@ -33,7 +37,6 @@ export async function uploadFileToPc(
 
   const isSendingToPc = targetDeviceId === 'pc-host';
 
-  // 1. Create transfer record on the server
   const transfer = await createTransferRecord({
     fileName: file.name,
     mimeType: file.mimeType || 'application/octet-stream',
@@ -43,10 +46,8 @@ export async function uploadFileToPc(
     idempotencyKey: `upload-${creds.deviceId}-${Date.now()}-${file.name}`,
   });
 
-  // 2. Stream binary file directly to /api/transfers/:id/upload
   const uploadUrl = `${creds.serverUrl.replace(/\/+$/, '')}/api/transfers/${transfer.id}/upload`;
 
-  // Use FileSystemUploadType.BINARY_CONTENT for raw streaming
   const uploadTask = FileSystem.createUploadTask(
     uploadUrl,
     file.uri,
@@ -76,13 +77,14 @@ export async function uploadFileToPc(
 }
 
 /**
- * Download a file from the Windows PC server directly to local storage.
- * Streams to disk via createDownloadResumable (no memory buffering).
+ * Download a file from the Windows PC server directly into public Downloads/DevDrop folder.
  */
 export async function downloadFileFromPc(
   transfer: Transfer,
   onProgress?: DownloadProgressCallback
 ): Promise<string> {
+  await requestStoragePermissions();
+
   const creds = await getCredentials();
   if (!creds) {
     throw new Error('Device is not paired with a PC server');
@@ -90,14 +92,14 @@ export async function downloadFileFromPc(
 
   const downloadUrl = `${creds.serverUrl.replace(/\/+$/, '')}/api/transfers/${transfer.id}/download`;
 
-  // Target local destination in document / cache directory
-  const baseDir = FileSystem.documentDirectory || FileSystem.cacheDirectory;
+  // Download first to cache directory
+  const baseDir = FileSystem.cacheDirectory || FileSystem.documentDirectory;
   const sanitizedName = transfer.fileName.replace(/[/\\?%*:|"<>]/g, '_');
-  const targetUri = `${baseDir}${Date.now()}_${sanitizedName}`;
+  const tempUri = `${baseDir}dl_${Date.now()}_${sanitizedName}`;
 
   const downloadResumable = FileSystem.createDownloadResumable(
     downloadUrl,
-    targetUri,
+    tempUri,
     {
       headers: {
         Authorization: `Bearer ${creds.deviceToken}`,
@@ -116,22 +118,41 @@ export async function downloadFileFromPc(
     throw new Error('Download failed: file not written to storage');
   }
 
+  // Move downloaded file to public Downloads/DevDrop folder
+  if (DevDropServerModule?.saveDownloadedFile) {
+    try {
+      const saved = await DevDropServerModule.saveDownloadedFile(result.uri, transfer.fileName);
+      if (saved?.path) {
+        return `file://${saved.path}`;
+      }
+    } catch (saveErr) {
+      console.warn('Fallback to cache URI after saveDownloadedFile warning:', saveErr);
+    }
+  }
+
   return result.uri;
+}
+
+/**
+ * Open file in external viewer / gallery or open native system share sheet
+ */
+export async function openFile(fileUri: string, mimeType?: string): Promise<void> {
+  const isAvailable = await Sharing.isAvailableAsync();
+  if (!isAvailable) {
+    throw new Error('File viewer / sharing is not available on this device');
+  }
+
+  await Sharing.shareAsync(fileUri, {
+    mimeType: mimeType || undefined,
+    dialogTitle: 'Open DevDrop File',
+  });
 }
 
 /**
  * Open native share / save dialog for downloaded file
  */
 export async function shareOrSaveFile(fileUri: string, mimeType?: string): Promise<void> {
-  const isAvailable = await Sharing.isAvailableAsync();
-  if (!isAvailable) {
-    throw new Error('Native file sharing is not available on this device');
-  }
-
-  await Sharing.shareAsync(fileUri, {
-    mimeType: mimeType || undefined,
-    dialogTitle: 'Save or Share DevDrop File',
-  });
+  await openFile(fileUri, mimeType);
 }
 
 /**

@@ -14,6 +14,8 @@ import { useRouter } from 'expo-router';
 import { useApp } from '../../src/state/AppContext';
 import { fetchDevices } from '../../src/services/api/client';
 import { socketService } from '../../src/services/sockets/socket.service';
+import { sendDirectText } from '../../src/services/network/directTransfer.service';
+import { nativeServer } from '../../src/services/nativeServer/nativeServer.service';
 import { COLORS } from '../../src/constants';
 import type { Device } from '../../src/types';
 
@@ -26,7 +28,7 @@ interface TextSnippet {
 
 export default function TextScreen() {
   const router = useRouter();
-  const { credentials } = useApp();
+  const { credentials, nearbyPeers } = useApp();
   const [textInput, setTextInput] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [snippets, setSnippets] = useState<TextSnippet[]>([]);
@@ -55,7 +57,7 @@ export default function TextScreen() {
       setLoadingSnippets(true);
       const res = await fetch(`${credentials.serverUrl}/api/text`, {
         headers: {
-          Authorization: `Bearer ${credentials.token}`,
+          Authorization: `Bearer ${credentials.deviceToken}`,
         },
       });
       if (res.ok) {
@@ -108,29 +110,57 @@ export default function TextScreen() {
   };
 
   const handleSendText = async () => {
-    if (!textInput.trim() || !credentials?.serverUrl) return;
+    if (!textInput.trim()) return;
 
     setIsSending(true);
     try {
-      const res = await fetch(`${credentials.serverUrl}/api/text`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${credentials.token}`,
-        },
-        body: JSON.stringify({
-          text: textInput.trim(),
-          destinationDeviceId: selectedTargetId,
-        }),
-      });
-
-      if (res.ok) {
+      if (selectedTargetId.startsWith('peer:')) {
+        const parts = selectedTargetId.split(':');
+        const peerIp = parts[1];
+        const peerPort = parseInt(parts[2], 10) || 4545;
+        await sendDirectText(
+          peerIp,
+          peerPort,
+          textInput.trim(),
+          credentials?.deviceName || 'Android Device'
+        );
+        setSnippets((prev) => [
+          {
+            id: `sent-${Date.now()}`,
+            text: textInput.trim(),
+            senderName: 'You (Direct)',
+            createdAt: Date.now(),
+          },
+          ...prev,
+        ]);
         setTextInput('');
-        loadSnippets();
-        Alert.alert('Sent', 'Text has been sent to ' + getTargetName());
+        Alert.alert('Sent', 'Text sent directly to ' + getTargetName());
       } else {
-        const errJson = await res.json().catch(() => ({}));
-        Alert.alert('Error', errJson.error?.message || 'Failed to send text');
+        if (!credentials?.serverUrl) {
+          Alert.alert('Offline', 'PC Server is not connected. Select a nearby Wi-Fi device instead.');
+          return;
+        }
+
+        const res = await fetch(`${credentials.serverUrl}/api/text`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${credentials.deviceToken}`,
+          },
+          body: JSON.stringify({
+            text: textInput.trim(),
+            destinationDeviceId: selectedTargetId,
+          }),
+        });
+
+        if (res.ok) {
+          setTextInput('');
+          loadSnippets();
+          Alert.alert('Sent', 'Text has been sent to ' + getTargetName());
+        } else {
+          const errJson = await res.json().catch(() => ({}));
+          Alert.alert('Error', errJson.error?.message || 'Failed to send text');
+        }
       }
     } catch (err: any) {
       Alert.alert('Error', err.message || 'Network error');
@@ -141,6 +171,11 @@ export default function TextScreen() {
 
   const getTargetName = () => {
     if (selectedTargetId === 'pc-host') return 'Host PC';
+    if (selectedTargetId.startsWith('peer:')) {
+      const parts = selectedTargetId.split(':');
+      const peer = nearbyPeers.find((p) => p.ip === parts[1]);
+      return peer ? peer.name : `Peer (${parts[1]})`;
+    }
     const d = devices.find((dev) => dev.id === selectedTargetId);
     return d?.name || 'Selected Device';
   };
@@ -168,6 +203,36 @@ export default function TextScreen() {
               Host PC
             </Text>
           </TouchableOpacity>
+
+          {/* Nearby Wi-Fi Peers */}
+          {nearbyPeers.map((peer) => {
+            const peerId = `peer:${peer.ip}:${peer.port}`;
+            const isSelected = selectedTargetId === peerId;
+            return (
+              <TouchableOpacity
+                key={peer.id}
+                style={[
+                  styles.deviceChip,
+                  isSelected && styles.deviceChipSelected,
+                  { borderColor: isSelected ? COLORS.primary : 'rgba(99, 102, 241, 0.4)' },
+                ]}
+                onPress={() => setSelectedTargetId(peerId)}
+              >
+                <Text style={styles.chipIcon}>
+                  {peer.nodeType === 'android-peer' ? '📱' : '💻'}
+                </Text>
+                <Text
+                  style={[
+                    styles.chipName,
+                    isSelected && styles.chipNameSelected,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {peer.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
 
           {devices.map((d) => (
             <TouchableOpacity
