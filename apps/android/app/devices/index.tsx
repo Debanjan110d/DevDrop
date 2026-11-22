@@ -164,15 +164,25 @@ export default function DevicesScreen() {
 
       {/* Connect Two Phones / Share Connection Section */}
       <View style={[styles.card, { marginTop: 16 }]}>
-        <Text style={styles.sectionTitle}>Connect Another Phone</Text>
+        <Text style={styles.sectionTitle}>Connect Devices & Share</Text>
         <Text style={styles.sectionSubtitle}>
-          Want to connect another phone on the same Wi-Fi? Show a pairing QR code directly on this phone screen so the second phone can scan and connect instantly!
+          Connect another phone or computer on the same Wi-Fi. Show a pairing QR code on this screen for another device to scan, or open the camera to scan their QR code!
         </Text>
 
-        <TouchableOpacity style={styles.sharePairBtn} onPress={handleOpenPairingQr}>
-          <Text style={styles.sharePairIcon}>📲</Text>
-          <Text style={styles.sharePairBtnText}>Pair Another Phone (Show QR)</Text>
-        </TouchableOpacity>
+        <View style={styles.pairActionsRow}>
+          <TouchableOpacity style={[styles.sharePairBtn, styles.pairHalfBtn]} onPress={handleOpenPairingQr}>
+            <Text style={styles.sharePairIcon}>📲</Text>
+            <Text style={styles.sharePairBtnText}>Show My QR</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.sharePairBtn, styles.pairHalfBtn, styles.scanPairBtn]}
+            onPress={() => router.push('/pairing')}
+          >
+            <Text style={styles.sharePairIcon}>📷</Text>
+            <Text style={styles.sharePairBtnText}>Scan QR Code</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Other Network Devices List */}
@@ -359,10 +369,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: 8,
     backgroundColor: COLORS.primary,
     paddingVertical: 14,
     borderRadius: 10,
+  },
+  pairActionsRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  pairHalfBtn: {
+    flex: 1,
+    paddingVertical: 12,
+  },
+  scanPairBtn: {
+    backgroundColor: '#0284c7', // Sky-600
   },
   sharePairIcon: {
     fontSize: 20,

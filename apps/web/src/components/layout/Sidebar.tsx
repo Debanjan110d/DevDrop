@@ -54,15 +54,24 @@ export function Sidebar() {
         </ul>
       </nav>
 
-      {/* Footer / Product Page shortcut */}
-      <div className="p-3 border-t border-border">
+      {/* Footer / Product Page shortcut & GitHub */}
+      <div className="p-3 border-t border-border space-y-1">
         <Link
           to="/"
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-slate-400 hover:text-indigo-300 hover:bg-surface-elevated transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-indigo-300 hover:bg-surface-elevated transition-colors"
         >
           <Globe className="h-3.5 w-3.5" />
-          <span>Product Landing Page ↗</span>
+          <span>Product Website</span>
         </Link>
+        <a
+          href="https://github.com/Debanjan110d/DevDrop"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-surface-elevated transition-colors"
+        >
+          <span>GitHub</span>
+          <span className="text-[10px] text-slate-500 font-mono">@Debanjan110d</span>
+        </a>
       </div>
     </aside>
   );

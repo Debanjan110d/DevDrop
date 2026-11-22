@@ -57,9 +57,11 @@ export function LandingPage() {
       <header className="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-indigo-500 to-sky-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20">
-              <Zap className="h-5 w-5" />
-            </div>
+            <img
+              src="/favicon.png"
+              alt="DevDrop Logo"
+              className="h-9 w-9 rounded-xl shadow-md object-contain"
+            />
             <div>
               <span className="font-bold text-lg tracking-tight text-white">DevDrop</span>
               <span className="ml-2 text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
@@ -78,6 +80,9 @@ export function LandingPage() {
             <a href="#storage" className="hover:text-white transition-colors">
               Storage & Media
             </a>
+            <a href="#security" className="hover:text-white transition-colors">
+              Safety & Privacy
+            </a>
             <a href="#specs" className="hover:text-white transition-colors">
               Protocol Specs
             </a>
@@ -87,6 +92,15 @@ export function LandingPage() {
           </nav>
 
           <div className="flex items-center gap-3">
+            <a
+              href="https://github.com/Debanjan110d/DevDrop"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-200 text-xs font-semibold transition-colors"
+            >
+              <span>GitHub</span>
+              <ExternalLink className="h-3 w-3 text-slate-400" />
+            </a>
             <Link
               to="/dashboard"
               className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-200 text-xs font-semibold transition-colors"
@@ -805,14 +819,65 @@ while (isRunning) {
         </div>
       </section>
 
+      {/* Safety & Privacy Transparency */}
+      <section id="security" className="border-t border-slate-800/80 bg-slate-900/40 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+          <div className="max-w-3xl space-y-3">
+            <div className="text-xs font-mono font-semibold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+              <Shield className="h-3.5 w-3.5" /> Safety & Non-Malicious Transparency
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white">
+              100% Private, Safe & Verified Open Source.
+            </h2>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              DevDrop is built strictly for direct communication on your personal Wi-Fi network. It contains zero spyware, zero analytics beacons, zero remote command execution, and zero third-party cloud data transmission.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-5 space-y-3">
+              <div className="flex items-center gap-2 text-indigo-400 font-semibold text-sm">
+                <Lock className="h-4 w-4" />
+                <span>Strict RFC 1918 Scope</span>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Network traffic only routes across private addresses (<code className="font-mono text-slate-300">192.168.x.x</code> / <code className="font-mono text-slate-300">10.x.x.x</code>). No packets leave your home or office router.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-5 space-y-3">
+              <div className="flex items-center gap-2 text-emerald-400 font-semibold text-sm">
+                <CheckCircle className="h-4 w-4" />
+                <span>Transparent Permissions</span>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Camera access is used solely for QR decoding. Storage access is restricted to the user-visible <code className="font-mono text-slate-300">Downloads/DevDrop</code> directory.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-5 space-y-3">
+              <div className="flex items-center gap-2 text-sky-400 font-semibold text-sm">
+                <Terminal className="h-4 w-4" />
+                <span>Independent Network Audits</span>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Verify packets with Wireshark or tcpdump anytime. Review the complete source code or audit reproduction instructions on GitHub.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-slate-900 bg-slate-950 py-12 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-900 pb-6">
-            <div className="flex items-center gap-2">
-              <div className="h-6 w-6 rounded-lg bg-indigo-500 flex items-center justify-center text-white">
-                <Zap className="h-3.5 w-3.5" />
-              </div>
+            <div className="flex items-center gap-2.5">
+              <img
+                src="/favicon.png"
+                alt="DevDrop Logo"
+                className="h-7 w-7 rounded-lg object-contain shadow-sm"
+              />
               <span className="font-bold text-slate-200 text-sm">DevDrop</span>
               <span className="text-slate-400 text-xs">— Your devices. Your network. Your files.</span>
             </div>
@@ -826,11 +891,31 @@ while (isRunning) {
               <Link to="/settings" className="hover:text-slate-200 transition-colors">Settings</Link>
               <a href="/devdrop.apk" download="devdrop.apk" className="hover:text-slate-200 transition-colors">Download APK</a>
               <a href="/devdrop-extension.zip" download="devdrop-extension.zip" className="hover:text-slate-200 transition-colors">Extension</a>
+              <a
+                href="https://github.com/Debanjan110d/DevDrop"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-slate-200 transition-colors inline-flex items-center gap-1 text-indigo-400 font-medium"
+              >
+                <span>GitHub Repository</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-            <p>© 2026 DevDrop. Open-source under the MIT License. No tracking, zero cloud relay.</p>
+            <p>
+              © 2026 DevDrop. Created & maintained by{' '}
+              <a
+                href="https://github.com/Debanjan110d"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-slate-300 underline hover:text-white"
+              >
+                Debanjan (@Debanjan110d)
+              </a>
+              . Open-source under MIT License.
+            </p>
             <p className="text-[11px] text-slate-400">
               Engineered with React Native, Node.js, Express, Kotlin & Vite.
             </p>

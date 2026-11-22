@@ -141,6 +141,29 @@ export default function SettingsScreen() {
         </View>
       </View>
 
+      {/* Open Source & Developer Info */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Open Source Project</Text>
+        <View style={styles.card}>
+          <View style={styles.row}>
+            <Text style={styles.label}>Author</Text>
+            <Text style={[styles.value, { color: '#818cf8', fontWeight: 'bold' }]}>Debanjan (@Debanjan110d)</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Repository</Text>
+            <Text style={styles.value}>github.com/Debanjan110d/DevDrop</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>License</Text>
+            <Text style={styles.value}>MIT License</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Security Model</Text>
+            <Text style={[styles.value, { color: '#34d399' }]}>100% LAN Only (RFC 1918)</Text>
+          </View>
+        </View>
+      </View>
+
       {/* Connection Reset */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Danger Zone</Text>

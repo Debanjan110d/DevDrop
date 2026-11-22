@@ -187,6 +187,25 @@ export default function DashboardScreen() {
         </View>
       </View>
 
+      {/* Quick QR Connect Bar */}
+      <View style={styles.qrBarContainer}>
+        <TouchableOpacity
+          style={[styles.qrBarBtn, styles.qrBarScan]}
+          onPress={() => router.push('/pairing')}
+        >
+          <Text style={styles.qrBarBtnIcon}>📷</Text>
+          <Text style={styles.qrBarBtnText}>Scan QR Code</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.qrBarBtn, styles.qrBarShow]}
+          onPress={() => router.push('/devices')}
+        >
+          <Text style={styles.qrBarBtnIcon}>📲</Text>
+          <Text style={styles.qrBarBtnText}>Show My QR</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Action Buttons */}
       <View style={styles.actionsGrid}>
         <TouchableOpacity
@@ -482,6 +501,38 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.text,
     fontWeight: '500',
+  },
+  qrBarContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  qrBarBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 11,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  qrBarScan: {
+    backgroundColor: 'rgba(2, 132, 199, 0.15)',
+    borderColor: '#0284c7',
+  },
+  qrBarShow: {
+    backgroundColor: 'rgba(99, 102, 241, 0.15)',
+    borderColor: '#6366f1',
+  },
+  qrBarBtnIcon: {
+    fontSize: 16,
+  },
+  qrBarBtnText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#ffffff',
   },
   actionsGrid: {
     flexDirection: 'row',

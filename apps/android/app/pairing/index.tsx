@@ -82,6 +82,24 @@ export default function PairingScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      {/* Header bar with Back button */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <TouchableOpacity
+          onPress={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/dashboard');
+            }
+          }}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.08)' }}
+        >
+          <Text style={{ color: '#94a3b8', fontSize: 13, fontWeight: '600' }}>← Back</Text>
+        </TouchableOpacity>
+        <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>Camera QR Scanner</Text>
+        <View style={{ width: 60 }} />
+      </View>
+
       {/* Tabs */}
       <View style={styles.tabContainer}>
         <TouchableOpacity

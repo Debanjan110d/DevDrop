@@ -110,18 +110,22 @@ vercel
 
 ---
 
-## Documentation
+## Documentation & Transparency
 
 | Document | Description |
 |---|---|
+| [SECURITY.md](SECURITY.md) | Safe software declaration, permissions transparency & audit guide |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Complete system architecture, state machines, component specs |
 | [docs/API.md](docs/API.md) | Full REST API reference & Socket.IO event catalogue |
-| [docs/SECURITY.md](docs/SECURITY.md) | Authentication model, pairing tokens, file isolation, security audit |
 | [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) | Local developer environment setup, build instructions |
 
 ---
 
+## Author & Maintainer
+
+Created and actively maintained by **Debanjan** ([@Debanjan110d](https://github.com/Debanjan110d)).  
+Official GitHub Repository: [https://github.com/Debanjan110d/DevDrop](https://github.com/Debanjan110d/DevDrop)
+
 ## License
 
-MIT © 2026 DevDrop
-# DevDrop
+MIT License © 2026 DevDrop Contributors. Free and open-source software.
