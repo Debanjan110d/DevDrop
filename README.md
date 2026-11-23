@@ -124,8 +124,21 @@ vercel
 ## Author & Maintainer
 
 Created and actively maintained by **Debanjan** ([@Debanjan110d](https://github.com/Debanjan110d)).  
-Official GitHub Repository: [https://github.com/Debanjan110d/DevDrop](https://github.com/Debanjan110d/DevDrop)  
-Support Development: [☕ Buy Me a Chai (buymeachai.in/debanjan110d)](https://buymeachai.in/debanjan110d)
+Official GitHub Repository: [https://github.com/Debanjan110d/DevDrop](https://github.com/Debanjan110d/DevDrop)
+
+## Support the Project
+
+If DevDrop saves you time transferring files or clipboard items, consider buying me a cup of chai!
+
+<p align="center">
+  <a href="https://buymeachai.in/debanjan110d" target="_blank" rel="noopener noreferrer">
+    <img src="docs/images/buymeachai.jpg" alt="Buy Me a Chai - Debanjan" width="360" style="border-radius: 16px;" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://buymeachai.in/debanjan110d"><strong>👉 Support on buymeachai.in/debanjan110d</strong></a>
+</p>
 
 ## License
 

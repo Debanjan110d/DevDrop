@@ -71,10 +71,10 @@ export function Sidebar() {
           className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 transition-colors"
         >
           <span className="flex items-center gap-2">
-            <Coffee className="h-3.5 w-3.5" />
+            <img src="/buymeachai.jpg" alt="Chai" className="h-4 w-4 rounded-full object-cover border border-amber-400/40" />
             <span>Buy Me a Chai</span>
           </span>
-          <span className="text-[10px] text-amber-500/80 font-mono">☕</span>
+          <span className="text-[10px] text-amber-500/80 font-mono">Support</span>
         </a>
         <a
           href="https://github.com/Debanjan110d/DevDrop"

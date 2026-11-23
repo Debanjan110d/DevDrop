@@ -29,12 +29,16 @@ import {
   Lock,
   Coffee,
   Heart,
+  ChevronDown,
+  Menu,
+  X,
 } from 'lucide-react';
 
 export function LandingPage() {
   const [activeTab, setActiveTab] = useState<'p2p' | 'text' | 'storage' | 'updates'>('p2p');
   const [copiedSnippet, setCopiedSnippet] = useState(false);
   const [testTextCopied, setTestTextCopied] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -72,64 +76,269 @@ export function LandingPage() {
             </div>
           </div>
 
-          <nav className="hidden md:flex items-center gap-8 text-sm text-slate-300">
-            <a href="#features" className="hover:text-white transition-colors">
-              Features
-            </a>
-            <a href="#architecture" className="hover:text-white transition-colors">
-              Autonomous P2P
-            </a>
-            <a href="#storage" className="hover:text-white transition-colors">
-              Storage & Media
-            </a>
-            <a href="#security" className="hover:text-white transition-colors">
-              Safety & Privacy
-            </a>
-            <a href="#specs" className="hover:text-white transition-colors">
-              Protocol Specs
-            </a>
-            <a href="#downloads" className="hover:text-white transition-colors">
+          {/* Main Navigation with Smooth Dropdowns */}
+          <nav className="hidden lg:flex items-center gap-6 text-sm text-slate-300">
+            {/* Features Dropdown */}
+            <div className="relative group">
+              <button
+                type="button"
+                className="flex items-center gap-1.5 py-2 hover:text-white transition-colors text-sm font-medium focus:outline-none"
+              >
+                <span>Features</span>
+                <ChevronDown className="h-3.5 w-3.5 text-slate-400 group-hover:text-white group-hover:rotate-180 transition-transform duration-200" />
+              </button>
+
+              <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-1 group-hover:translate-y-0 transition-all duration-200 z-50">
+                <div className="w-72 rounded-2xl border border-slate-800 bg-slate-900/95 backdrop-blur-xl p-2.5 shadow-2xl space-y-1">
+                  <a
+                    href="#architecture"
+                    className="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-800/80 transition-colors"
+                  >
+                    <div className="h-8 w-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shrink-0 text-indigo-400">
+                      <Smartphone className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-white">Autonomous P2P</div>
+                      <div className="text-[11px] text-slate-400">Direct phone-to-phone LAN transfer</div>
+                    </div>
+                  </a>
+
+                  <a
+                    href="#storage"
+                    className="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-800/80 transition-colors"
+                  >
+                    <div className="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 text-emerald-400">
+                      <FolderDown className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-white">Storage & Media</div>
+                      <div className="text-[11px] text-slate-400">Public Downloads/DevDrop folder</div>
+                    </div>
+                  </a>
+
+                  <a
+                    href="#features"
+                    className="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-800/80 transition-colors"
+                  >
+                    <div className="h-8 w-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0 text-amber-400">
+                      <Copy className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-white">Quick Text Sync</div>
+                      <div className="text-[11px] text-slate-400">Cross-device clipboard sharing</div>
+                    </div>
+                  </a>
+
+                  <a
+                    href="#downloads"
+                    className="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-800/80 transition-colors"
+                  >
+                    <div className="h-8 w-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0 text-sky-400">
+                      <Puzzle className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-white">Browser Extension</div>
+                      <div className="text-[11px] text-slate-400">Chrome, Edge & Brave support</div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Safety & Protocol Dropdown */}
+            <div className="relative group">
+              <button
+                type="button"
+                className="flex items-center gap-1.5 py-2 hover:text-white transition-colors text-sm font-medium focus:outline-none"
+              >
+                <span>Safety & Specs</span>
+                <ChevronDown className="h-3.5 w-3.5 text-slate-400 group-hover:text-white group-hover:rotate-180 transition-transform duration-200" />
+              </button>
+
+              <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible translate-y-1 group-hover:translate-y-0 transition-all duration-200 z-50">
+                <div className="w-72 rounded-2xl border border-slate-800 bg-slate-900/95 backdrop-blur-xl p-2.5 shadow-2xl space-y-1">
+                  <a
+                    href="#security"
+                    className="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-800/80 transition-colors"
+                  >
+                    <div className="h-8 w-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 text-emerald-400">
+                      <Shield className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-white">Safety Transparency</div>
+                      <div className="text-[11px] text-slate-400">100% LAN scope & non-malicious</div>
+                    </div>
+                  </a>
+
+                  <a
+                    href="#specs"
+                    className="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-800/80 transition-colors"
+                  >
+                    <div className="h-8 w-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shrink-0 text-indigo-400">
+                      <Server className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-white">Protocol Specs</div>
+                      <div className="text-[11px] text-slate-400">Zero cloud & raw Wi-Fi speed</div>
+                    </div>
+                  </a>
+
+                  <a
+                    href="#security"
+                    className="flex items-start gap-3 p-2 rounded-xl hover:bg-slate-800/80 transition-colors"
+                  >
+                    <div className="h-8 w-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0 text-sky-400">
+                      <Terminal className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-white">Network Audits</div>
+                      <div className="text-[11px] text-slate-400">Wireshark & tcpdump instructions</div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Direct Downloads Link */}
+            <a href="#downloads" className="hover:text-white transition-colors font-medium">
               Downloads
             </a>
           </nav>
 
-          <div className="flex items-center gap-3">
+          {/* Right Action Cluster */}
+          <div className="flex items-center gap-2.5">
+            {/* Buy Me a Chai with Authentic Glass Illustration */}
             <a
               href="https://buymeachai.in/debanjan110d"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold transition-colors"
-              title="Buy Me a Chai"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold shadow-sm transition-all hover:scale-[1.02]"
+              title="Buy Me a Chai - buymeachai.in/debanjan110d"
             >
-              <Coffee className="h-3.5 w-3.5 text-amber-400" />
-              <span>Buy Me a Chai</span>
+              <img
+                src="/buymeachai.jpg"
+                alt="Chai"
+                className="h-4 w-4 rounded-full object-cover border border-amber-400/40"
+              />
+              <span className="hidden sm:inline">Buy Me a Chai</span>
             </a>
+
+            {/* GitHub */}
             <a
               href="https://github.com/Debanjan110d/DevDrop"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-200 text-xs font-semibold transition-colors"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-200 text-xs font-semibold transition-colors"
             >
               <span>GitHub</span>
               <ExternalLink className="h-3 w-3 text-slate-400" />
             </a>
+
+            {/* Dashboard */}
             <Link
               to="/dashboard"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-200 text-xs font-semibold transition-colors"
+              className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-200 text-xs font-semibold transition-colors"
             >
               <span>Dashboard</span>
               <ArrowUpRight className="h-3.5 w-3.5 text-slate-400" />
             </Link>
+
+            {/* Primary Download Button */}
             <a
               href="/devdrop.apk"
               download="devdrop.apk"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition-all"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition-all"
             >
               <Download className="h-3.5 w-3.5" />
               <span>Get APK</span>
             </a>
+
+            {/* Mobile Menu Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-1.5 rounded-xl border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-900 focus:outline-none"
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Slide-down Menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden border-t border-slate-800 bg-slate-950/95 px-4 pt-3 pb-6 space-y-4">
+            <div className="space-y-1">
+              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-1">Features</div>
+              <a
+                href="#architecture"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-slate-800"
+              >
+                Autonomous P2P Transfers
+              </a>
+              <a
+                href="#storage"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-slate-800"
+              >
+                Storage & Dedicated Public Folder
+              </a>
+              <a
+                href="#features"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-slate-800"
+              >
+                Quick Text & Clipboard Sync
+              </a>
+            </div>
+
+            <div className="space-y-1 pt-2 border-t border-slate-800/80">
+              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-1">Safety & Protocol</div>
+              <a
+                href="#security"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-slate-800"
+              >
+                Safety & Non-Malicious Transparency
+              </a>
+              <a
+                href="#specs"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-slate-800"
+              >
+                Protocol Specs & Zero Cloud
+              </a>
+              <a
+                href="#downloads"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2 rounded-lg text-sm text-slate-200 hover:bg-slate-800"
+              >
+                Downloads (APK & Extension)
+              </a>
+            </div>
+
+            <div className="pt-3 border-t border-slate-800/80 flex flex-col gap-2">
+              <a
+                href="https://buymeachai.in/debanjan110d"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs font-semibold"
+              >
+                <img src="/buymeachai.jpg" alt="Chai" className="h-4 w-4 rounded-full object-cover" />
+                <span>Support on Buy Me a Chai</span>
+              </a>
+              <Link
+                to="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 text-xs font-semibold"
+              >
+                <span>Launch Web Dashboard</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
@@ -886,38 +1095,44 @@ while (isRunning) {
         </div>
       </section>
 
-      {/* Support & Community Section */}
-      <section className="border-t border-slate-800/80 bg-gradient-to-b from-amber-500/5 to-transparent py-14">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs font-semibold">
-            <Coffee className="h-3.5 w-3.5 text-amber-400" />
-            <span>Support Open-Source Development</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white">Enjoying DevDrop? Buy Me a Chai!</h2>
-          <p className="text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
-            DevDrop is built as a 100% free, private, and ad-free tool for developers and users. If it speeds up your daily workflow, consider supporting ongoing maintenance with a cup of chai.
-          </p>
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="https://buymeachai.in/debanjan110d"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition-all hover:scale-105"
-            >
-              <Coffee className="h-4 w-4" />
-              <span>buymeachai.in/debanjan110d</span>
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-            <a
-              href="https://github.com/Debanjan110d/DevDrop"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-200 text-sm font-semibold transition-colors"
-            >
-              <span>Star on GitHub</span>
-              <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
-            </a>
-          </div>
+      {/* Support DevDrop: Buy Me a Chai */}
+      <section className="border-t border-slate-800/80 bg-slate-950 py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <a
+            href="https://buymeachai.in/debanjan110d"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block rounded-3xl border border-amber-500/25 bg-gradient-to-br from-amber-500/10 via-slate-900/90 to-slate-950 overflow-hidden shadow-2xl hover:border-amber-500/50 hover:shadow-amber-500/10 transition-all duration-300"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-12 items-center">
+              <div className="md:col-span-5 p-6 flex items-center justify-center bg-amber-500/5 border-b md:border-b-0 md:border-r border-amber-500/10">
+                <img
+                  src="/buymeachai.jpg"
+                  alt="Chai - Indian Tea"
+                  className="w-full max-w-[280px] rounded-2xl shadow-lg group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <div className="md:col-span-7 p-6 sm:p-8 space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-500/30 bg-amber-500/15 text-amber-300 text-xs font-semibold">
+                  <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+                  <span>Support Creator</span>
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-bold text-white group-hover:text-amber-300 transition-colors">
+                  Enjoying DevDrop? Buy Me a Chai!
+                </h3>
+                <p className="text-sm text-slate-300 leading-relaxed">
+                  DevDrop is 100% free, private, and ad-free. If it makes transferring files and text seamless for you, consider fueling future updates with a cup of chai!
+                </p>
+                <div className="pt-2 flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 group-hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-md transition-all">
+                    <span>buymeachai.in/debanjan110d</span>
+                    <ExternalLink className="h-4 w-4" />
+                  </span>
+                  <span className="text-xs text-slate-400">Direct creator support</span>
+                </div>
+              </div>
+            </div>
+          </a>
         </div>
       </section>
 
