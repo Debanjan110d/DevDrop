@@ -17,6 +17,7 @@ import { Badge } from '../components/ui/Badge';
 import { useDevices } from '../hooks/useDevices';
 import { getSocket } from '../services/socket';
 import { formatRelativeTime } from '../utils/format';
+import { getBaseUrl } from '../services/api';
 
 interface TextSnippet {
   id: string;
@@ -47,7 +48,13 @@ export function TextPage() {
   const loadTextSnippets = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch('/api/text');
+      const baseUrl = getBaseUrl().replace(/\/api$/, '');
+      const token = localStorage.getItem('devdrop_auth_token') || 'pc-local';
+      const res = await fetch(`${baseUrl}/api/text`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data)) {
@@ -116,18 +123,21 @@ export function TextPage() {
 
   // Send text
   const handleSendText = async () => {
-    if (!textInput.trim() || !selectedDeviceId) return;
+    if (!textInput.trim()) return;
 
     setIsSending(true);
     try {
-      const res = await fetch('/api/text', {
+      const baseUrl = getBaseUrl().replace(/\/api$/, '');
+      const token = localStorage.getItem('devdrop_auth_token') || 'pc-local';
+      const res = await fetch(`${baseUrl}/api/text`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           text: textInput.trim(),
-          destinationDeviceId: selectedDeviceId,
+          destinationDeviceId: selectedDeviceId || 'pc-host',
         }),
       });
 

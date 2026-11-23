@@ -8,7 +8,7 @@ import { sendSuccess, sendError } from '../../utils/response.js';
 import { createTransfer, getTransfer, updateTransfer, listTransfers, cancelTransfer } from '../../services/transfer.service.js';
 import { finalizeUpload, streamFileToResponse, cleanupTempFile } from '../../services/storage.service.js';
 import { getTempFilePath } from '../../storage/index.js';
-import { sanitizeFilename } from '../../utils/filename.js';
+import { sanitizeFilename, resolveUniqueFilePath } from '../../utils/filename.js';
 import { AuthRequest } from '../middleware/auth.js';
 import { logger } from '../../utils/logger.js';
 import { getIO } from '../../sockets/index.js';
@@ -201,7 +201,7 @@ export async function downloadTransferHandler(req: AuthRequest, res: Response, n
     }
     const transfer = await getTransfer(id);
 
-    if (transfer.status !== 'available' && transfer.status !== 'completed') {
+    if (transfer.status !== 'available' && transfer.status !== 'completed' && transfer.status !== 'downloading') {
       sendError(res, 409, 'FILE_NOT_AVAILABLE', `Transfer is in '${transfer.status}' state; file not ready`);
       return;
     }
@@ -215,14 +215,17 @@ export async function downloadTransferHandler(req: AuthRequest, res: Response, n
     res.setHeader('Content-Type', mimeType);
     res.setHeader('Content-Disposition', `attachment; filename="${path.basename(transfer.fileName)}"`);
 
-    await updateTransfer(transfer.id, { status: 'downloading' });
+    // Only transition status if transfer wasn't already completed
+    if (transfer.status !== 'completed') {
+      await updateTransfer(transfer.id, { status: 'downloading' });
 
-    res.on('finish', async () => {
-      await updateTransfer(transfer.id, {
-        status: 'completed',
-        completedAt: Date.now(),
-      }).catch(() => {});
-    });
+      res.on('finish', async () => {
+        await updateTransfer(transfer.id, {
+          status: 'completed',
+          completedAt: Date.now(),
+        }).catch(() => {});
+      });
+    }
 
     streamFileToResponse(transfer.storagePath, res);
   } catch (err) {
@@ -250,6 +253,7 @@ export async function sendTextHandler(req: AuthRequest, res: Response, next: Nex
     const fileName = `Text-${Date.now()}.txt`;
     const fullPath = path.join(config.storageDir, targetFolder, fileName);
 
+    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
     fs.writeFileSync(fullPath, text, 'utf8');
     const bytes = Buffer.byteLength(text, 'utf8');
 
@@ -287,6 +291,137 @@ export async function sendTextHandler(req: AuthRequest, res: Response, next: Nex
     }
 
     sendSuccess(res, { id, text, senderName, transfer }, 201);
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * Autonomous LAN Direct Text Drop handler (unauthenticated for instant local Wi-Fi drops)
+ */
+export async function directTextDropHandler(req: any, res: Response, next: NextFunction): Promise<void> {
+  try {
+    let text = '';
+    let senderName = req.headers['x-sender-name'] || 'Nearby Device';
+
+    if (typeof req.body === 'object' && req.body !== null) {
+      text = req.body.text || '';
+      if (req.body.senderName) {
+        senderName = req.body.senderName;
+      }
+    } else if (typeof req.body === 'string') {
+      text = req.body;
+    }
+
+    if (!text || !text.trim()) {
+      sendError(res, 400, 'VALIDATION_ERROR', 'Text content is required');
+      return;
+    }
+
+    const trimmedText = text.trim();
+    const id = crypto.randomUUID();
+    const targetFolder = 'From-Mobile';
+    const fileName = `Text-${Date.now()}.txt`;
+    const fullPath = path.join(config.storageDir, targetFolder, fileName);
+
+    fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+    fs.writeFileSync(fullPath, trimmedText, 'utf8');
+    const bytes = Buffer.byteLength(trimmedText, 'utf8');
+
+    const transfer = {
+      id,
+      fileName,
+      mimeType: 'text/plain',
+      fileSize: bytes,
+      direction: 'mobile-to-pc' as const,
+      sourceDeviceId: 'peer-lan',
+      destinationDeviceId: 'pc-host',
+      status: 'completed',
+      storagePath: fullPath,
+      bytesTransferred: bytes,
+      createdAt: Date.now(),
+      completedAt: Date.now(),
+    };
+    db.transfers.insert(transfer);
+
+    const io = getIO();
+    if (io) {
+      io.emit('transfer:created', transfer);
+      io.emit('text:received', {
+        id,
+        text: trimmedText,
+        senderId: 'peer-lan',
+        senderName: String(senderName),
+        destinationDeviceId: 'pc-host',
+        createdAt: Date.now(),
+      });
+    }
+
+    sendSuccess(res, { id, text: trimmedText, senderName, transfer }, 200);
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * Autonomous LAN Direct File Drop handler (unauthenticated for instant local Wi-Fi binary streaming)
+ */
+export async function directFileDropHandler(req: any, res: Response, next: NextFunction): Promise<void> {
+  try {
+    let rawFileName = (req.headers['x-file-name'] as string) || `devdrop_file_${Date.now()}.bin`;
+    try {
+      rawFileName = decodeURIComponent(rawFileName);
+    } catch {}
+    let safeName = 'file.bin';
+    try {
+      safeName = sanitizeFilename(rawFileName);
+    } catch {
+      safeName = `devdrop_file_${Date.now()}.bin`;
+    }
+
+    const fullDir = path.join(config.storageDir, 'From-Mobile');
+    fs.mkdirSync(fullDir, { recursive: true });
+    const fullPath = resolveUniqueFilePath(fullDir, safeName);
+    const fileName = path.basename(fullPath);
+
+    const writeStream = fs.createWriteStream(fullPath);
+
+    req.pipe(writeStream);
+
+    writeStream.on('finish', () => {
+      const stats = fs.statSync(fullPath);
+      const id = crypto.randomUUID();
+      const mimeType = (req.headers['content-type'] as string) || mime.lookup(fileName) || 'application/octet-stream';
+
+      const transfer = {
+        id,
+        fileName,
+        mimeType,
+        fileSize: stats.size,
+        direction: 'mobile-to-pc' as const,
+        sourceDeviceId: 'peer-lan',
+        destinationDeviceId: 'pc-host',
+        status: 'completed',
+        storagePath: fullPath,
+        bytesTransferred: stats.size,
+        createdAt: Date.now(),
+        completedAt: Date.now(),
+      };
+      db.transfers.insert(transfer);
+
+      const io = getIO();
+      if (io) {
+        io.emit('transfer:created', transfer);
+        io.emit('transfer:completed', transfer);
+      }
+
+      sendSuccess(res, { success: true, fileName, transfer }, 200);
+    });
+
+    writeStream.on('error', (err) => {
+      try { fs.unlinkSync(fullPath); } catch {}
+      next(err);
+    });
   } catch (err) {
     next(err);
   }

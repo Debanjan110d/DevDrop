@@ -55,7 +55,8 @@ export default function TextScreen() {
     if (!credentials?.serverUrl) return;
     try {
       setLoadingSnippets(true);
-      const res = await fetch(`${credentials.serverUrl}/api/text`, {
+      const cleanUrl = credentials.serverUrl.replace(/\/+$/, '');
+      const res = await fetch(`${cleanUrl}/api/text`, {
         headers: {
           Authorization: `Bearer ${credentials.deviceToken}`,
         },
@@ -113,6 +114,7 @@ export default function TextScreen() {
     if (!textInput.trim()) return;
 
     setIsSending(true);
+    const content = textInput.trim();
     try {
       if (selectedTargetId.startsWith('peer:')) {
         const parts = selectedTargetId.split(':');
@@ -121,13 +123,13 @@ export default function TextScreen() {
         await sendDirectText(
           peerIp,
           peerPort,
-          textInput.trim(),
+          content,
           credentials?.deviceName || 'Android Device'
         );
         setSnippets((prev) => [
           {
             id: `sent-${Date.now()}`,
-            text: textInput.trim(),
+            text: content,
             senderName: 'You (Direct)',
             createdAt: Date.now(),
           },
@@ -141,25 +143,64 @@ export default function TextScreen() {
           return;
         }
 
-        const res = await fetch(`${credentials.serverUrl}/api/text`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${credentials.deviceToken}`,
-          },
-          body: JSON.stringify({
-            text: textInput.trim(),
-            destinationDeviceId: selectedTargetId,
-          }),
-        });
+        const cleanUrl = credentials.serverUrl.replace(/\/+$/, '');
+        let sent = false;
 
-        if (res.ok) {
+        try {
+          const res = await fetch(`${cleanUrl}/api/text`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${credentials.deviceToken}`,
+            },
+            body: JSON.stringify({
+              text: content,
+              destinationDeviceId: selectedTargetId || 'pc-host',
+            }),
+          });
+
+          if (res.ok) {
+            sent = true;
+          } else {
+            // If server returned non-ok (e.g. auth issue), try direct drop to PC
+            const urlObj = new URL(cleanUrl);
+            await sendDirectText(
+              urlObj.hostname,
+              parseInt(urlObj.port, 10) || 4545,
+              content,
+              credentials?.deviceName || 'Android Device'
+            );
+            sent = true;
+          }
+        } catch {
+          // Network failure: fallback to LAN direct text drop
+          try {
+            const urlObj = new URL(cleanUrl);
+            await sendDirectText(
+              urlObj.hostname,
+              parseInt(urlObj.port, 10) || 4545,
+              content,
+              credentials?.deviceName || 'Android Device'
+            );
+            sent = true;
+          } catch (dropErr: any) {
+            throw new Error(dropErr.message || 'Failed to reach PC server');
+          }
+        }
+
+        if (sent) {
+          setSnippets((prev) => [
+            {
+              id: `sent-${Date.now()}`,
+              text: content,
+              senderName: 'You',
+              createdAt: Date.now(),
+            },
+            ...prev,
+          ]);
           setTextInput('');
           loadSnippets();
           Alert.alert('Sent', 'Text has been sent to ' + getTargetName());
-        } else {
-          const errJson = await res.json().catch(() => ({}));
-          Alert.alert('Error', errJson.error?.message || 'Failed to send text');
         }
       }
     } catch (err: any) {

@@ -12,6 +12,7 @@ interface Props {
 export function CopyButton({ transferId, fileName, className = '', showLabel = false }: Props) {
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [copiedType, setCopiedType] = useState<'image' | 'text' | 'file'>('text');
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -21,6 +22,7 @@ export function CopyButton({ transferId, fileName, className = '', showLabel = f
     try {
       const res = await copyTransferToClipboard(transferId, fileName);
       if (res.success) {
+        setCopiedType(res.type);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       }
@@ -29,10 +31,17 @@ export function CopyButton({ transferId, fileName, className = '', showLabel = f
     }
   };
 
+  const getLabel = () => {
+    if (!copied) return 'Copy';
+    if (copiedType === 'image') return 'Copied Image!';
+    if (copiedType === 'text') return 'Copied Text!';
+    return 'Copied Name!';
+  };
+
   return (
     <button
       onClick={handleCopy}
-      title={copied ? 'Copied to clipboard!' : 'Copy to clipboard'}
+      title={copied ? getLabel() : 'Copy content to clipboard'}
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${
         copied
           ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
@@ -46,8 +55,7 @@ export function CopyButton({ transferId, fileName, className = '', showLabel = f
       ) : (
         <Copy className="h-3.5 w-3.5" />
       )}
-      {showLabel && <span>{copied ? 'Copied!' : 'Copy'}</span>}
+      {showLabel && <span>{getLabel()}</span>}
     </button>
   );
 }
-

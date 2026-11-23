@@ -10,9 +10,15 @@ import {
   downloadTransferHandler,
   sendTextHandler,
   listTextHandler,
+  directTextDropHandler,
+  directFileDropHandler,
 } from '../controllers/transfers.controller.js';
 
 const router = Router();
+
+// Unauthenticated direct LAN drop endpoints (Autonomous LAN P2P)
+router.post('/text/direct-drop', directTextDropHandler as any);
+router.post('/transfers/direct-drop', directFileDropHandler as any);
 
 router.use(authMiddleware as any);
 
