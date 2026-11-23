@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
+  Linking,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useApp } from '../../src/state/AppContext';
@@ -153,6 +154,13 @@ export default function SettingsScreen() {
             <Text style={styles.label}>Repository</Text>
             <Text style={styles.value}>github.com/Debanjan110d/DevDrop</Text>
           </View>
+          <TouchableOpacity
+            style={[styles.row, { paddingVertical: 4 }]}
+            onPress={() => Linking.openURL('https://buymeachai.in/debanjan110d')}
+          >
+            <Text style={styles.label}>Support Creator</Text>
+            <Text style={[styles.value, { color: '#f59e0b', fontWeight: 'bold' }]}>☕ buymeachai.in/debanjan110d</Text>
+          </TouchableOpacity>
           <View style={styles.row}>
             <Text style={styles.label}>License</Text>
             <Text style={styles.value}>MIT License</Text>

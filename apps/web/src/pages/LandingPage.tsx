@@ -27,6 +27,8 @@ import {
   ArrowUpRight,
   Cpu,
   Lock,
+  Coffee,
+  Heart,
 } from 'lucide-react';
 
 export function LandingPage() {
@@ -92,6 +94,16 @@ export function LandingPage() {
           </nav>
 
           <div className="flex items-center gap-3">
+            <a
+              href="https://buymeachai.in/debanjan110d"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold transition-colors"
+              title="Buy Me a Chai"
+            >
+              <Coffee className="h-3.5 w-3.5 text-amber-400" />
+              <span>Buy Me a Chai</span>
+            </a>
             <a
               href="https://github.com/Debanjan110d/DevDrop"
               target="_blank"
@@ -874,6 +886,41 @@ while (isRunning) {
         </div>
       </section>
 
+      {/* Support & Community Section */}
+      <section className="border-t border-slate-800/80 bg-gradient-to-b from-amber-500/5 to-transparent py-14">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs font-semibold">
+            <Coffee className="h-3.5 w-3.5 text-amber-400" />
+            <span>Support Open-Source Development</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white">Enjoying DevDrop? Buy Me a Chai!</h2>
+          <p className="text-sm text-slate-400 max-w-xl mx-auto leading-relaxed">
+            DevDrop is built as a 100% free, private, and ad-free tool for developers and users. If it speeds up your daily workflow, consider supporting ongoing maintenance with a cup of chai.
+          </p>
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="https://buymeachai.in/debanjan110d"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition-all hover:scale-105"
+            >
+              <Coffee className="h-4 w-4" />
+              <span>buymeachai.in/debanjan110d</span>
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+            <a
+              href="https://github.com/Debanjan110d/DevDrop"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl border border-slate-700 bg-slate-900/60 hover:bg-slate-800 text-slate-200 text-sm font-semibold transition-colors"
+            >
+              <span>Star on GitHub</span>
+              <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-slate-900 bg-slate-950 py-12 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -897,6 +944,15 @@ while (isRunning) {
               <Link to="/settings" className="hover:text-slate-200 transition-colors">Settings</Link>
               <a href="/devdrop.apk" download="devdrop.apk" className="hover:text-slate-200 transition-colors">Download APK</a>
               <a href="/devdrop-extension.zip" download="devdrop-extension.zip" className="hover:text-slate-200 transition-colors">Extension</a>
+              <a
+                href="https://buymeachai.in/debanjan110d"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-amber-300 transition-colors inline-flex items-center gap-1 text-amber-400 font-medium"
+              >
+                <Coffee className="h-3 w-3" />
+                <span>Buy Me a Chai</span>
+              </a>
               <a
                 href="https://github.com/Debanjan110d/DevDrop"
                 target="_blank"

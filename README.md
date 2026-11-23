@@ -124,7 +124,8 @@ vercel
 ## Author & Maintainer
 
 Created and actively maintained by **Debanjan** ([@Debanjan110d](https://github.com/Debanjan110d)).  
-Official GitHub Repository: [https://github.com/Debanjan110d/DevDrop](https://github.com/Debanjan110d/DevDrop)
+Official GitHub Repository: [https://github.com/Debanjan110d/DevDrop](https://github.com/Debanjan110d/DevDrop)  
+Support Development: [☕ Buy Me a Chai (buymeachai.in/debanjan110d)](https://buymeachai.in/debanjan110d)
 
 ## License
 

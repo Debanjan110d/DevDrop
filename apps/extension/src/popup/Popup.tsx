@@ -170,14 +170,24 @@ export default function Popup() {
 
       <div style={{ padding: '8px 16px', borderTop: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: '#64748b' }}>
         <span>DevDrop v1.2</span>
-        <a
-          href="https://github.com/Debanjan110d/DevDrop"
-          target="_blank"
-          rel="noreferrer"
-          style={{ color: '#818cf8', textDecoration: 'none' }}
-        >
-          GitHub (@Debanjan110d)
-        </a>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <a
+            href="https://buymeachai.in/debanjan110d"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: '#f59e0b', textDecoration: 'none', fontWeight: 600 }}
+          >
+            ☕ Buy Me a Chai
+          </a>
+          <a
+            href="https://github.com/Debanjan110d/DevDrop"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: '#818cf8', textDecoration: 'none' }}
+          >
+            GitHub
+          </a>
+        </div>
       </div>
     </div>
   );
