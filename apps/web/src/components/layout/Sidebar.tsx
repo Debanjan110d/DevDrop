@@ -8,9 +8,9 @@ import {
   Settings,
   MessageSquare,
   Globe,
-  Coffee,
 } from 'lucide-react';
 import { clsx } from 'clsx';
+import { BuyMeAChai } from '../ui/BuyMeAChai';
 
 const navItems = [
   { label: 'Dashboard', path: '/dashboard', Icon: LayoutDashboard },
@@ -64,18 +64,9 @@ export function Sidebar() {
           <Globe className="h-3.5 w-3.5" />
           <span>Product Website</span>
         </Link>
-        <a
-          href="https://buymeachai.in/debanjan110d"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-medium text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 transition-colors"
-        >
-          <span className="flex items-center gap-2">
-            <img src="/buymeachai.jpg" alt="Chai" className="h-4 w-4 rounded-full object-cover border border-amber-400/40" />
-            <span>Buy Me a Chai</span>
-          </span>
-          <span className="text-[10px] text-amber-500/80 font-mono">Support</span>
-        </a>
+        <div className="py-1">
+          <BuyMeAChai variant="pill" size="sm" className="w-full justify-center" />
+        </div>
         <a
           href="https://github.com/Debanjan110d/DevDrop"
           target="_blank"

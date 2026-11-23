@@ -132,6 +132,12 @@ If DevDrop saves you time transferring files or clipboard items, consider buying
 
 <p align="center">
   <a href="https://buymeachai.in/debanjan110d" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.shields.io/badge/☕_Buy_me_a_chai-FFC436?style=for-the-badge&logoColor=18181B&labelColor=FFC436&color=18181B" alt="Buy me a chai" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://buymeachai.in/debanjan110d" target="_blank" rel="noopener noreferrer">
     <img src="docs/images/buymeachai.jpg" alt="Buy Me a Chai - Debanjan" width="360" style="border-radius: 16px;" />
   </a>
 </p>

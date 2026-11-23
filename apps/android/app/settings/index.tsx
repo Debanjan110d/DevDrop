@@ -155,11 +155,22 @@ export default function SettingsScreen() {
             <Text style={styles.value}>github.com/Debanjan110d/DevDrop</Text>
           </View>
           <TouchableOpacity
-            style={[styles.row, { paddingVertical: 4 }]}
+            style={{
+              backgroundColor: '#FFC436',
+              borderRadius: 9999,
+              paddingVertical: 10,
+              paddingHorizontal: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              marginVertical: 10,
+            }}
             onPress={() => Linking.openURL('https://buymeachai.in/debanjan110d')}
           >
-            <Text style={styles.label}>Support Creator</Text>
-            <Text style={[styles.value, { color: '#f59e0b', fontWeight: 'bold' }]}>☕ buymeachai.in/debanjan110d</Text>
+            <Text style={{ fontSize: 16 }}>☕</Text>
+            <Text style={{ color: '#18181B', fontWeight: 'bold', fontSize: 13 }}>Buy me a chai</Text>
+            <Text style={{ color: '#18181B', fontWeight: 'bold', fontSize: 13 }}>↗</Text>
           </TouchableOpacity>
           <View style={styles.row}>
             <Text style={styles.label}>License</Text>

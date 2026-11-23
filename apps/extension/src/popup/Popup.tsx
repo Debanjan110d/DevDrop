@@ -175,9 +175,20 @@ export default function Popup() {
             href="https://buymeachai.in/debanjan110d"
             target="_blank"
             rel="noreferrer"
-            style={{ color: '#f59e0b', textDecoration: 'none', fontWeight: 600 }}
+            style={{
+              background: '#FFC436',
+              color: '#18181B',
+              padding: '2px 8px',
+              borderRadius: '9999px',
+              fontWeight: 700,
+              fontSize: '10px',
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '3px',
+            }}
           >
-            ☕ Buy Me a Chai
+            <span>☕</span> Buy me a chai <span>↗</span>
           </a>
           <a
             href="https://github.com/Debanjan110d/DevDrop"

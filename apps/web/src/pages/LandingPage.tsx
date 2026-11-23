@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { BuyMeAChai } from '../components/ui/BuyMeAChai';
 import {
   Download,
   Shield,
@@ -207,21 +208,8 @@ export function LandingPage() {
 
           {/* Right Action Cluster */}
           <div className="flex items-center gap-2.5">
-            {/* Buy Me a Chai with Authentic Glass Illustration */}
-            <a
-              href="https://buymeachai.in/debanjan110d"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-semibold shadow-sm transition-all hover:scale-[1.02]"
-              title="Buy Me a Chai - buymeachai.in/debanjan110d"
-            >
-              <img
-                src="/buymeachai.jpg"
-                alt="Chai"
-                className="h-4 w-4 rounded-full object-cover border border-amber-400/40"
-              />
-              <span className="hidden sm:inline">Buy Me a Chai</span>
-            </a>
+            {/* Buy Me a Chai Signature Golden Pill */}
+            <BuyMeAChai variant="pill" size="sm" />
 
             {/* GitHub */}
             <a
@@ -319,15 +307,7 @@ export function LandingPage() {
             </div>
 
             <div className="pt-3 border-t border-slate-800/80 flex flex-col gap-2">
-              <a
-                href="https://buymeachai.in/debanjan110d"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs font-semibold"
-              >
-                <img src="/buymeachai.jpg" alt="Chai" className="h-4 w-4 rounded-full object-cover" />
-                <span>Support on Buy Me a Chai</span>
-              </a>
+              <BuyMeAChai variant="pill" size="md" className="w-full justify-center" />
               <Link
                 to="/dashboard"
                 onClick={() => setMobileMenuOpen(false)}
@@ -1123,12 +1103,10 @@ while (isRunning) {
                 <p className="text-sm text-slate-300 leading-relaxed">
                   DevDrop is 100% free, private, and ad-free. If it makes transferring files and text seamless for you, consider fueling future updates with a cup of chai!
                 </p>
-                <div className="pt-2 flex flex-wrap items-center gap-3">
-                  <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 group-hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-md transition-all">
-                    <span>buymeachai.in/debanjan110d</span>
-                    <ExternalLink className="h-4 w-4" />
-                  </span>
-                  <span className="text-xs text-slate-400">Direct creator support</span>
+                <div className="pt-2 flex flex-wrap items-center gap-4">
+                  <BuyMeAChai variant="pill" size="lg" />
+                  <BuyMeAChai variant="outline" size="md" />
+                  <span className="text-xs text-slate-400">Direct creator support • buymeachai.in/debanjan110d</span>
                 </div>
               </div>
             </div>
@@ -1159,15 +1137,7 @@ while (isRunning) {
               <Link to="/settings" className="hover:text-slate-200 transition-colors">Settings</Link>
               <a href="/devdrop.apk" download="devdrop.apk" className="hover:text-slate-200 transition-colors">Download APK</a>
               <a href="/devdrop-extension.zip" download="devdrop-extension.zip" className="hover:text-slate-200 transition-colors">Extension</a>
-              <a
-                href="https://buymeachai.in/debanjan110d"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-amber-300 transition-colors inline-flex items-center gap-1 text-amber-400 font-medium"
-              >
-                <Coffee className="h-3 w-3" />
-                <span>Buy Me a Chai</span>
-              </a>
+              <BuyMeAChai variant="footer" />
               <a
                 href="https://github.com/Debanjan110d/DevDrop"
                 target="_blank"
